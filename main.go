@@ -7,15 +7,17 @@ import (
 
 func main() {
 
-	acc := models.NewAccount("George", 123, 456, 2324.66)
-	// acc2 := models.Account{Name: "George"}
-	// acc3 := models.Account{Name: "George"}
+	source_acc := models.NewAccount("Perl", 123, 456, 2424.66)
+	target_acc := models.NewAccount("Julia", 123, 456, 2424.66)
 
-	fmt.Println(*acc)
-	models.Withdraw(acc, 324.66)
-	fmt.Println(*acc)
-	models.Withdraw(acc, 1000)
-	fmt.Println(*acc)
-	models.Withdraw(acc, 980)
-	fmt.Println(*acc)
+	fmt.Println(source_acc.GetName(), source_acc.CheckBalance())
+	fmt.Println(target_acc.GetName(), target_acc.CheckBalance())
+	source_acc.Transfer(target_acc, 0.66)
+	fmt.Println(source_acc.GetName(), source_acc.CheckBalance())
+	fmt.Println(target_acc.GetName(), target_acc.CheckBalance())
+	fmt.Println()
+	target_acc.Withdraw(2)
+	fmt.Println(source_acc.GetName(), source_acc.CheckBalance())
+	fmt.Println(target_acc.GetName(), target_acc.CheckBalance())
+
 }

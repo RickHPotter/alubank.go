@@ -3,45 +3,28 @@ package models
 import (
 	"fmt"
 	"github/RickHPotter/alubank_alura_course/utils"
+	"strconv"
 )
 
 type Account struct {
-	Name          string
-	AgencyNumber  int
-	AccountNumber int
-	Balance       float64
+	name          string
+	agencyNumber  int
+	accountNumber int
+	balance       float64
 }
 
-func NewAccount(name string, agencyNumber int, accountNumber int, balance float64) *Account {
-	account := Account{name, agencyNumber, accountNumber, balance}
-	return &account
+/*
+DEV INTERFACE
+*/
+
+func (self_acc *Account) _add(number float64) {
+	res := utils.RoundFloat(self_acc.balance+number, 2)
+	self_acc.balance = res
 }
 
-func Withdraw(acc *Account, withdraw float64) {
-	fee := utils.RoundFloat(_calculateFees("withdraw", withdraw), 2)
-	newBalance := utils.RoundFloat(acc.Balance-withdraw-fee, 2)
-
-	if newBalance >= 0 {
-		acc.Balance = newBalance
-
-		fmt.Print("[ACCEPTED] £", withdraw, " has been checked out of your account.\n")
-		fmt.Print("The fee for this operation was £", fee, ".\n")
-		fmt.Print("Your new balance is £", acc.Balance, ".\n")
-	} else {
-		if acc.Balance >= withdraw {
-			fmt.Println("[DENIED] Enough money to withdraw but not enough for fee.")
-		} else {
-			fmt.Println("[DENIED] You cannot withdraw more money than your balance.")
-		}
-	}
-}
-
-func Deposit() {
-
-}
-
-func CheckBalance() {
-
+func (self_acc *Account) _subtract(number float64) {
+	res := utils.RoundFloat(self_acc.balance-number, 2)
+	self_acc.balance = res
 }
 
 func _calculateFees(operation string, number float64) float64 {
@@ -49,12 +32,88 @@ func _calculateFees(operation string, number float64) float64 {
 
 	switch operation {
 	case "withdraw":
-		fee = number * 0.01
-	case "deposit":
-		fee = 0
+		fee = utils.RoundFloat(number*0.01, 2)
 	case "checkBalance":
 		fee = 0.36
 	}
 
 	return fee
+}
+
+/*
+USER INTERFACE
+*/
+
+// DATA
+
+func (self_acc *Account) GetName() string {
+	return self_acc.name
+}
+
+func (self_acc *Account) getAgNum() int {
+	return self_acc.agencyNumber
+}
+
+func (self_acc *Account) getAccNum() int {
+	return self_acc.accountNumber
+}
+
+func (self_acc *Account) CheckBalance() string {
+	balance := strconv.FormatFloat(self_acc.balance, 'f', 2, 64)
+	return "£" + balance
+	// TODO: implement fee for production
+}
+
+// OPERATIONS
+
+func NewAccount(name string, agencyNumber int, accountNumber int, balance float64) *Account {
+	account := Account{name, agencyNumber, accountNumber, balance}
+	return &account
+}
+
+func (self_acc *Account) Withdraw(withdraw float64) {
+	fee := _calculateFees("withdraw", withdraw)
+
+	if withdraw > 0 {
+
+		if self_acc.balance >= withdraw+fee {
+			self_acc._subtract(withdraw + fee)
+
+			fmt.Print("[ACCEPTED]\n")
+			fmt.Print("£", withdraw, " checked out of your account.\n")
+			fmt.Print("£", fee, " was the operation fee.\n")
+			fmt.Print("£", self_acc.balance, " is your new balance.\n")
+		} else {
+			if self_acc.balance >= withdraw {
+				fmt.Println("[DENIED] Enough money to withdraw but not enough for fee.")
+			} else {
+				fmt.Println("[DENIED] You cannot withdraw more money than your balance.")
+			}
+		}
+	} else {
+		fmt.Println("[DENIED] (Negative Withdraw Not Allowed) Man, you must be tripping.")
+	}
+}
+
+func (self_acc *Account) Deposit(deposit float64) {
+	if deposit > 0 {
+		self_acc._add(deposit)
+		fmt.Println("[ACCEPTED] Done. Your new balance is", self_acc.balance)
+	} else {
+		fmt.Println("[DENIED] (Negative Deposit Not Allowed) Man, you must be tripping.")
+	}
+}
+
+func (self_acc *Account) Transfer(target_acc *Account, number float64) {
+	// let's consider that there's only one bank, therefore no fee for transfer
+	if number <= self_acc.balance {
+		self_acc._subtract(number)
+		fmt.Print("£", number, " was reduced from ", self_acc.name, "'s account.\n")
+		target_acc._add(number)
+		fmt.Print("£", number, " was added to ", target_acc.name, "'s account.\n")
+		fmt.Println("Handshake!")
+	} else {
+		fmt.Println("[DENIED] (Insufficient Funds) Man, you must be tripping.")
+	}
+
 }
