@@ -7,7 +7,7 @@ import (
 )
 
 type Account struct {
-	name          string
+	holder        Client
 	agencyNumber  int
 	accountNumber int
 	balance       float64
@@ -47,14 +47,14 @@ USER INTERFACE
 // DATA
 
 func (self_acc *Account) GetName() string {
-	return self_acc.name
+	return self_acc.holder.name
 }
 
-func (self_acc *Account) getAgNum() int {
+func (self_acc *Account) GetAgNum() int {
 	return self_acc.agencyNumber
 }
 
-func (self_acc *Account) getAccNum() int {
+func (self_acc *Account) GetAccNum() int {
 	return self_acc.accountNumber
 }
 
@@ -66,8 +66,8 @@ func (self_acc *Account) CheckBalance() string {
 
 // OPERATIONS
 
-func NewAccount(name string, agencyNumber int, accountNumber int, balance float64) *Account {
-	account := Account{name, agencyNumber, accountNumber, balance}
+func NewAccount(holder *Client, agencyNumber int, accountNumber int, balance float64) *Account {
+	account := Account{*holder, agencyNumber, accountNumber, balance}
 	return &account
 }
 
@@ -108,9 +108,9 @@ func (self_acc *Account) Transfer(target_acc *Account, number float64) {
 	// let's consider that there's only one bank, therefore no fee for transfer
 	if number <= self_acc.balance {
 		self_acc._subtract(number)
-		fmt.Print("£", number, " was reduced from ", self_acc.name, "'s account.\n")
+		fmt.Print("£", number, " was reduced from ", self_acc.GetName(), "'s account,\n")
 		target_acc._add(number)
-		fmt.Print("£", number, " was added to ", target_acc.name, "'s account.\n")
+		fmt.Print("£", number, " was added to ", target_acc.GetName(), "'s account.\n")
 		fmt.Println("Handshake!")
 	} else {
 		fmt.Println("[DENIED] (Insufficient Funds) Man, you must be tripping.")

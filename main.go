@@ -7,8 +7,11 @@ import (
 
 func main() {
 
-	source_acc := models.NewAccount("Perl", 123, 456, 2424.66)
-	target_acc := models.NewAccount("Julia", 123, 456, 2424.66)
+	p1 := models.NewClient("Ruby", "111", "Engineer")
+	p2 := models.NewClient("Julia", "222", "Scientist")
+
+	source_acc := models.NewAccount(p1, 123, 456, 2424.66)
+	target_acc := models.NewAccount(p2, 123, 456, 2424.66)
 
 	fmt.Println(source_acc.GetName(), source_acc.CheckBalance())
 	fmt.Println(target_acc.GetName(), target_acc.CheckBalance())
