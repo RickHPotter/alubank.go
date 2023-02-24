@@ -1,0 +1,3 @@
+There was use of interface to mix operations between Basic Bank Accounts and Current Accounts, but one method that could not be replicated was transfer, given that there's no overload in Golang.
+
+What could be done (with the knowledge I have at this time) is to refactor Transfer() methods into onesided operations, so we'd create TransferFrom() and TransferTo() without referencing the other struct, whichever it would be. TransferFrom() would be like Withdraw(), but this time without fee, and TransferTo() would be like Deposit().
